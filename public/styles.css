@@ -66,6 +66,9 @@ footer span { color: #cda86d; margin: 0 8px; }
 .link-row { display: flex; align-items: end; gap: 10px; padding: 12px 0; border-bottom: 1px solid #eeeede; }
 .link-row label { flex: 1; min-width: 0; font: bold 13px Arial, sans-serif; }
 .link-row input { display: block; margin-top: 8px; padding: 11px; font: 12px Arial, sans-serif; }
+.link-status { flex: none; color: #8b988d; font: 11px/1.4 Arial, sans-serif; }
+.link-status.status-opened { color: #9a6b27; }
+.link-status.status-viewed { color: #416c51; }
 .text-link { color: #416c51; font: bold 12px Arial, sans-serif; }
 .reveal-card { text-align: center; padding: 55px 30px; }
 .gift-icon { color: #c5a15e; font-size: 60px; margin-bottom: 20px; }
@@ -108,6 +111,9 @@ footer span { color: #cda86d; margin: 0 8px; }
 :root[data-theme="dark"] .notice { background: #2c3024; color: #d0d5bd; }
 :root[data-theme="dark"] .notice strong { color: #e3dfbe; }
 :root[data-theme="dark"] .link-row { border-color: #354139; }
+:root[data-theme="dark"] .link-status { color: #aab5aa; }
+:root[data-theme="dark"] .link-status.status-opened { color: #e6c27c; }
+:root[data-theme="dark"] .link-status.status-viewed { color: #a9d0ad; }
 :root[data-theme="dark"] .text-link { color: #a9d0ad; }
 :root[data-theme="dark"] .reveal-card p { color: #aab8ad; }
 :root[data-theme="dark"] .theme-toggle { border-color: #45564a; color: #f4d18c; background: #252f28; }

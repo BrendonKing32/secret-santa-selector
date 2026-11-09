@@ -14,10 +14,14 @@ export async function onRequestPost({ request, env }) {
     return json({ error: "This reveal link is invalid." }, 400);
   }
   try {
+    const tokenHash = await hashToken(data.token);
     const assignment = await env.DB.prepare(
       "SELECT giver, recipient FROM assignments WHERE token_hash = ?"
-    ).bind(await hashToken(data.token)).first();
+    ).bind(tokenHash).first();
     if (!assignment) return json({ error: "This reveal link was not found." }, 404);
+    await env.DB.prepare(
+      "UPDATE assignments SET viewed_at = COALESCE(viewed_at, datetime('now')) WHERE token_hash = ?"
+    ).bind(tokenHash).run();
     return json(assignment);
   } catch (error) {
     console.error("Failed to retrieve Secret Santa assignment", error);
