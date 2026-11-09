@@ -114,6 +114,23 @@ async function post(url, body) {
   return data;
 }
 
+async function refreshLinkStatuses(rows) {
+  try {
+    const { statuses } = await post("/api/status", { tokens: rows.map(({ token }) => token) });
+    statuses.forEach((status, index) => {
+      const message = status.viewed
+        ? "Assignment viewed"
+        : status.opened ? "Link opened · assignment not revealed" : "Not opened yet";
+      rows[index].status.textContent = message;
+      rows[index].status.classList.toggle("status-viewed", status.viewed);
+      rows[index].status.classList.toggle("status-opened", status.opened && !status.viewed);
+    });
+  } catch (error) {
+    for (const row of rows) row.status.textContent = "Activity unavailable · retrying";
+    console.warn("Could not refresh Secret Santa link activity.", error);
+  }
+}
+
 $("draw-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = $("draw-button");
@@ -122,6 +139,7 @@ $("draw-form").addEventListener("submit", async (event) => {
   $("setup-message").textContent = "";
   try {
     const result = await post("/api/draw", { names: names(), exclusions });
+    const statusRows = [];
     for (const { name, token } of result.links) {
       const row = document.createElement("div");
       row.className = "link-row";
@@ -145,14 +163,20 @@ $("draw-form").addEventListener("submit", async (event) => {
           $("results-message").textContent = "Select and copy the link manually.";
         }
       });
+      const status = document.createElement("span");
+      status.className = "link-status";
+      status.textContent = "Checking link activity…";
       label.append(link);
-      row.append(label, copy);
+      row.append(label, status, copy);
       $("link-list").append(row);
+      statusRows.push({ token, status });
     }
     $("organizer").classList.add("hidden");
     $("results").classList.remove("hidden");
     $("results-title").focus();
     window.scrollTo(0, 0);
+    await refreshLinkStatuses(statusRows);
+    window.setInterval(() => refreshLinkStatuses(statusRows), 10000);
   } catch (error) {
     $("setup-message").textContent = error.message || "Could not create your draw. Please try again.";
   } finally {
@@ -165,6 +189,9 @@ const revealToken = new URLSearchParams(location.hash.slice(1)).get("reveal");
 if (revealToken !== null) {
   $("organizer").classList.add("hidden");
   $("reveal").classList.remove("hidden");
+  post("/api/open", { token: revealToken }).catch((error) => {
+    $("reveal-message").textContent = `${error.message} You can still reveal your assignment.`;
+  });
 }
 $("reveal-button").addEventListener("click", async () => {
   const button = $("reveal-button");
@@ -174,6 +201,7 @@ $("reveal-button").addEventListener("click", async () => {
     const assignment = await post("/api/reveal", { token: revealToken });
     $("reveal-heading").textContent = assignment.recipient;
     $("reveal-description").textContent = `${assignment.giver}, you're their Secret Santa!`;
+    $("reveal-message").textContent = "";
     button.hidden = true;
   } catch (error) {
     $("reveal-message").textContent = error.message || "Could not reveal your assignment. Please try again.";

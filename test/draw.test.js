@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { validateDraw, match, hashToken } from "../lib/draw.js";
 import { onRequestPost as draw } from "../functions/api/draw.js";
 import { onRequestPost as reveal } from "../functions/api/reveal.js";
+import { onRequestPost as open } from "../functions/api/open.js";
+import { onRequestPost as status } from "../functions/api/status.js";
 import worker from "../worker.js";
 
 function database() {
@@ -16,6 +18,16 @@ function database() {
             sql, args,
             async first() {
               return rows.get(args[0]) ?? null;
+            },
+            async run() {
+              const row = rows.get(args[0]);
+              if (!row) return { meta: { changes: 0 } };
+              if (sql.includes("opened_at")) row.opened_at ??= "2026-01-01 00:00:00";
+              if (sql.includes("viewed_at")) row.viewed_at ??= "2026-01-01 00:00:00";
+              return { meta: { changes: 1 } };
+            },
+            async all() {
+              return { results: args.map((hash) => rows.get(hash)).filter(Boolean) };
             }
           };
         }
@@ -23,7 +35,7 @@ function database() {
     },
     async batch(statements) {
       for (const { args: [hash, giver, recipient] } of statements) {
-        rows.set(hash, { giver, recipient });
+        rows.set(hash, { token_hash: hash, giver, recipient, opened_at: null, viewed_at: null });
       }
     }
   };
@@ -87,6 +99,30 @@ test("draw stores only hashed tokens and reveals each assignment privately", asy
     recipients.push(assignment.recipient);
   }
   assert.equal(new Set(recipients).size, 4);
+  const activity = await status({
+    request: request({ tokens: links.map(({ token }) => token) }),
+    env: { DB }
+  });
+  assert.deepEqual((await activity.json()).statuses, links.map(() => ({ opened: false, viewed: true })));
+});
+
+test("link activity records first open and assignment reveal separately", async () => {
+  const DB = database();
+  const { links } = await (await draw({
+    request: request({ names: ["A", "B", "C"], exclusions: [] }),
+    env: { DB }
+  })).json();
+  const [{ token }] = links;
+  const unopened = await status({ request: request({ tokens: [token] }), env: { DB } });
+  assert.deepEqual((await unopened.json()).statuses, [{ opened: false, viewed: false }]);
+
+  assert.equal((await open({ request: request({ token }), env: { DB } })).status, 200);
+  const opened = await status({ request: request({ tokens: [token] }), env: { DB } });
+  assert.deepEqual((await opened.json()).statuses, [{ opened: true, viewed: false }]);
+
+  await reveal({ request: request({ token }), env: { DB } });
+  const viewed = await status({ request: request({ tokens: [token] }), env: { DB } });
+  assert.deepEqual((await viewed.json()).statuses, [{ opened: true, viewed: true }]);
 });
 
 test("API rejects impossible draws, invalid links, bad JSON, and oversized bodies", async () => {
@@ -95,6 +131,12 @@ test("API rejects impossible draws, invalid links, bad JSON, and oversized bodie
   assert.equal(DB.rows.size, 0);
   assert.equal((await reveal({ request: request({ token: "bad" }), env: { DB } })).status, 400);
   assert.equal((await reveal({ request: request({ token: "a".repeat(64) }), env: { DB } })).status, 404);
+  assert.equal((await open({ request: request({ token: "bad" }), env: { DB } })).status, 400);
+  assert.equal((await status({ request: request({ tokens: ["bad"] }), env: { DB } })).status, 400);
+  assert.equal((await status({
+    request: request({ tokens: ["a".repeat(64), "a".repeat(64)] }),
+    env: { DB }
+  })).status, 400);
   assert.equal((await draw({ request: request("{"), env: { DB } })).status, 400);
   assert.equal((await draw({ request: request("x".repeat(65537)), env: { DB } })).status, 413);
 });
@@ -108,7 +150,18 @@ test("Worker routes API requests and delegates static assets", async () => {
     body: JSON.stringify({ names: ["A", "B", "C"], exclusions: [] })
   }), env);
   assert.equal(result.status, 201);
-  assert.equal((await result.json()).links.length, 3);
+  const { links } = await result.json();
+  assert.equal(links.length, 3);
+  const opened = await worker.fetch(new Request("https://example.test/api/open", {
+    method: "POST",
+    body: JSON.stringify({ token: links[0].token })
+  }), env);
+  assert.equal(opened.status, 200);
+  const activity = await worker.fetch(new Request("https://example.test/api/status", {
+    method: "POST",
+    body: JSON.stringify({ tokens: [links[0].token] })
+  }), env);
+  assert.deepEqual((await activity.json()).statuses, [{ opened: true, viewed: false }]);
   const wrongMethod = await worker.fetch(new Request("https://example.test/api/draw"), env);
   assert.equal(wrongMethod.status, 405);
   assert.equal(wrongMethod.headers.get("allow"), "POST");
