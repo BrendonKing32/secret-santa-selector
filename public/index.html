@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153e35">
+  <meta name="description" content="A little magic for your Secret Santa exchange.">
+  <title>Secret Santa Selector</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Secret Santa Selector home"><span class="brand-icon" aria-hidden="true">✳</span> SECRET SANTA <span>SELECTOR</span></a>
+      <span class="header-note">A LITTLE HOLIDAY MAGIC <span aria-hidden="true">✦</span></span>
+    </header>
+
+    <main>
+      <section id="organizer">
+        <div class="hero">
+          <div class="eyebrow"><span aria-hidden="true">✦</span> THE JOY IS IN THE GIVING</div>
+          <h1>Make the magic<br><em>happen.</em></h1>
+          <p>Bring your favorite people together. We'll handle the names, the mixing, and the mystery.</p>
+        </div>
+
+        <div class="card" id="setup-card">
+          <div class="card-heading">
+            <div><span class="step-label">LET'S GET STARTED</span><h2>Set up your exchange</h2></div>
+            <span class="card-sparkle" aria-hidden="true">✳</span>
+          </div>
+          <form id="draw-form">
+            <div class="section-title"><span class="number">01</span><div><h3>Who's in?</h3><p>Add at least three people, one name per line.</p></div></div>
+            <label class="sr-only" for="names">Participant names, one per line</label>
+            <textarea id="names" rows="6" placeholder="Alex&#10;Jordan&#10;Sam&#10;Taylor" required></textarea>
+            <div class="field-foot"><span>First names are perfect. Keep them unique.</span><span id="name-count">0 PEOPLE</span></div>
+
+            <div class="divider"></div>
+            <div class="section-title"><span class="number">02</span><div><h3>Keep a little distance <span class="optional">OPTIONAL</span></h3><p>Exclude pairs who shouldn't draw each other, like partners.</p></div></div>
+            <div class="exclusion-controls">
+              <label class="sr-only" for="person-a">First participant</label>
+              <select id="person-a" aria-label="First participant"></select>
+              <span class="pair-symbol" aria-hidden="true">↔</span>
+              <label class="sr-only" for="person-b">Second participant</label>
+              <select id="person-b" aria-label="Second participant"></select>
+              <button type="button" class="button button-outline" id="add-exclusion">Add pair</button>
+            </div>
+            <ul id="exclusion-list" class="exclusion-list" aria-label="Excluded pairs"></ul>
+            <p class="form-message" id="setup-message" role="status" aria-live="polite"></p>
+            <div class="divider"></div>
+            <div class="form-footer">
+              <div><strong>Ready to make someone's day?</strong><p>We'll create a private link for everyone.</p></div>
+              <button class="button button-primary" id="draw-button" type="submit">Create the draw <span aria-hidden="true">↗</span></button>
+            </div>
+          </form>
+        </div>
+        <div class="assurances"><span><span aria-hidden="true">✦</span> NO SPOILERS</span><span><span aria-hidden="true">✦</span> NO EMAILS NEEDED</span><span><span aria-hidden="true">✦</span> MADE FOR SHARING</span></div>
+      </section>
+
+      <section id="results" class="hidden" aria-labelledby="results-title">
+        <div class="hero hero-small"><div class="eyebrow">THE NAMES ARE IN <span aria-hidden="true">✦</span></div><h1 id="results-title" tabindex="-1">Let the <em>giving</em> begin.</h1><p>Your draw is ready. Send each person their own link and let the surprises unfold.</p></div>
+        <div class="card">
+          <div class="card-heading"><div><span class="step-label">KEEP THE SECRET</span><h2>Share the magic</h2></div><span class="card-sparkle" aria-hidden="true">✳</span></div>
+          <div class="notice"><strong>Save these links before you leave.</strong> They can't be recovered from this page later. Anyone with a link can see that person's assignment, so share each one privately.</div>
+          <div id="link-list" class="link-list"></div>
+          <p class="form-message" id="results-message" role="status" aria-live="polite"></p>
+          <a class="text-link" href="/">Create another exchange →</a>
+        </div>
+      </section>
+
+      <section id="reveal" class="hidden" aria-labelledby="reveal-title">
+        <div class="hero hero-small"><div class="eyebrow">A LITTLE SECRET, JUST FOR YOU <span aria-hidden="true">✦</span></div><h1 id="reveal-title">You've got a <em>mission.</em></h1><p>Someone special is waiting to be surprised.</p></div>
+        <div class="card reveal-card">
+          <div class="gift-icon" aria-hidden="true">✳</div>
+          <span class="step-label">YOUR SECRET SANTA ASSIGNMENT</span>
+          <h2 id="reveal-heading">Ready for the big reveal?</h2>
+          <p id="reveal-description">Make sure nobody's peeking over your shoulder.</p>
+          <button type="button" class="button button-primary" id="reveal-button">Reveal my person <span aria-hidden="true">✦</span></button>
+          <p class="form-message" id="reveal-message" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+      <noscript><p class="notice">JavaScript is required to create a draw or reveal an assignment.</p></noscript>
+    </main>
+    <footer>MADE FOR MERRY MOMENTS <span aria-hidden="true">✦</span> KEEP THE MAGIC A SECRET</footer>
+  </div>
+</body>
+</html>
