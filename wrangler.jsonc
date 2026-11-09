@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "secret-santa-selector",
+  "main": "./worker.js",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "compatibility_date": "2026-01-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "secret-santa",
+      "database_id": "618c2d02-6c61-40cb-8501-41e54b22a62b",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
