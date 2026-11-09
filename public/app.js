@@ -1,7 +1,40 @@
 const $ = (id) => document.getElementById(id);
 const namesInput = $("names");
 const selects = [$("person-a"), $("person-b")];
+const themeToggle = $("theme-toggle");
+const themeColor = document.querySelector('meta[name="theme-color"]');
 let exclusions = [];
+
+function setTheme(theme, persist = false) {
+  document.documentElement.dataset.theme = theme;
+  const isDark = theme === "dark";
+  const label = `Switch to ${isDark ? "light" : "dark"} mode`;
+  themeToggle.setAttribute("aria-label", label);
+  themeToggle.title = label;
+  themeToggle.firstElementChild.textContent = isDark ? "☀" : "☾";
+  themeColor.content = isDark ? "#161b18" : "#153e35";
+  if (persist) {
+    try {
+      localStorage.setItem("theme", theme);
+    } catch (error) {
+      console.warn("Could not save the theme preference.", error);
+    }
+  }
+}
+
+try {
+  const savedTheme = localStorage.getItem("theme");
+  setTheme(savedTheme === "light" || savedTheme === "dark"
+    ? savedTheme
+    : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+} catch (error) {
+  console.warn("Could not read the theme preference.", error);
+  setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+
+themeToggle.addEventListener("click", () => {
+  setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
+});
 
 function names() {
   return namesInput.value.split(/\r?\n/).map((name) => name.trim()).filter(Boolean);
