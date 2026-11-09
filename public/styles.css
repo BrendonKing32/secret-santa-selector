@@ -73,11 +73,50 @@ footer span { color: #cda86d; margin: 0 8px; }
 .reveal-card p { color: #839187; font: 14px/1.6 Arial, sans-serif; }
 .reveal-card .button { margin-top: 18px; }
 .reveal-card .form-message { color: #a34f3e; }
+.header-actions { display: flex; align-items: center; gap: 20px; }
+.theme-toggle { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid #d8e1d7; border-radius: 50%; color: #41624f; background: #fffefa; font: 20px/1 Arial, sans-serif; }
+.theme-toggle:hover { background: #f1f6ef; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+:root[data-theme="dark"] { color-scheme: dark; color: #e7e7dc; background: #161b18; }
+:root[data-theme="dark"] body { background: radial-gradient(ellipse at 50% 12%, #222b25 0%, #161b18 58%); }
+:root[data-theme="dark"] .site-header { border-color: #35423a; }
+:root[data-theme="dark"] .brand { color: #e0eadf; }
+:root[data-theme="dark"] .brand span:last-child { color: #9baa9d; }
+:root[data-theme="dark"] .brand-icon { background: #315746; color: #f4cb70; }
+:root[data-theme="dark"] .header-note { color: #a0aea2; }
+:root[data-theme="dark"] .hero p { color: #aab8ad; }
+:root[data-theme="dark"] .card { background: #202722; border-color: #37433b; box-shadow: 0 16px 55px #00000030; }
+:root[data-theme="dark"] .number { border-color: #405347; background: #2a382f; color: #a5c1a8; }
+:root[data-theme="dark"] .section-title p,
+:root[data-theme="dark"] .form-footer p { color: #aab5aa; }
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] .link-row input { color: #e0e8df; background: #19201b; border-color: #3a493e; }
+:root[data-theme="dark"] textarea::placeholder { color: #839287; }
+:root[data-theme="dark"] .field-foot { color: #9ba99e; }
+:root[data-theme="dark"] .divider { background: #354139; }
+:root[data-theme="dark"] .optional { color: #9ba99e; }
+:root[data-theme="dark"] .pair-symbol { color: #9eaea1; }
+:root[data-theme="dark"] .button-outline { border-color: #45564a; color: #c1d5c3; background: #252f28; }
+:root[data-theme="dark"] .button-outline:hover { background: #303d33; }
+:root[data-theme="dark"] .button-primary { background: #39684f; }
+:root[data-theme="dark"] .button-primary:hover { background: #477a5e; }
+:root[data-theme="dark"] .exclusion-list li { background: #2a362e; }
+:root[data-theme="dark"] .remove-button { color: #e09a87; }
+:root[data-theme="dark"] .assurances { color: #a2b0a4; }
+:root[data-theme="dark"] footer { color: #9ba99e; }
+:root[data-theme="dark"] .notice { background: #2c3024; color: #d0d5bd; }
+:root[data-theme="dark"] .notice strong { color: #e3dfbe; }
+:root[data-theme="dark"] .link-row { border-color: #354139; }
+:root[data-theme="dark"] .text-link { color: #a9d0ad; }
+:root[data-theme="dark"] .reveal-card p { color: #aab8ad; }
+:root[data-theme="dark"] .theme-toggle { border-color: #45564a; color: #f4d18c; background: #252f28; }
+:root[data-theme="dark"] .theme-toggle:hover { background: #303d33; }
 @media (max-width: 600px) {
   .page { padding: 0 5%; }
   .site-header { height: 73px; }
   .header-note { display: none; }
+  .header-actions { gap: 0; }
   .hero { padding: 49px 0 32px; }
   .card { padding: 27px 22px; }
   .card-heading { margin-bottom: 28px; }
